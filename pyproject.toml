@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sqs-workflow"
+version = "0.2.0"
+description = "SQS (Special Quasirandom Structure) 生成工具 — 基于 icet"
+requires-python = ">=3.8"
+dependencies = [
+    "icet>=3.2.0",
+    "ase>=3.22.0",
+    "numpy>=1.20.0",
+    "rich>=13.0.0",
+    "questionary>=1.10.0",
+    "pydantic>=1.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=2.10.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+]
+viz = [
+    "matplotlib>=3.3.0",
+    "pymatgen>=2022.0.0",
+]
+
+[project.scripts]
+sqskit = "src.cli.modern_interactive:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
