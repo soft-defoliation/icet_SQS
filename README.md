@@ -8,14 +8,14 @@
 ## 快速开始
 
 ```bash
-# 1. 安装依赖
-pip install -r requirements.txt
+# 1. 安装
+pip install -e .
 
 # 2. 运行
-python sqskit_modern.py
+sqskit
 ```
 
-首次运行会自动生成 `dop.in` 模板，编辑后重新运行即可。
+首次运行会自动生成 `dop.in` 模板，编辑掺杂浓度后重新运行即可。
 
 ## 特性
 
@@ -62,7 +62,7 @@ tests/                        # 测试
 ## 测试
 
 ```bash
-python tests/test_generality.py
+pytest tests/ -v --tb=short
 ```
 
 ## 依赖

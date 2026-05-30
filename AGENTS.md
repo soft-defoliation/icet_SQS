@@ -9,11 +9,11 @@ SQS Workflow — A specialized SQS (Special Quasirandom Structure) generation to
 ## Entry Points
 
 ```bash
-# Main CLI entry (project root)
-python sqskit_modern.py
-
-# Installed entry point (after pip install -e .)
+# 运行（安装后直接使用）
 sqskit  # → src.cli.modern_interactive:main
+
+# 也可以直接运行入口文件
+python sqskit_modern.py
 
 # Individual pipeline steps (importable)
 # src.core.build_clusterspace.run()   # Step 1
