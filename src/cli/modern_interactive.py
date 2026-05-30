@@ -135,14 +135,14 @@ class ModernSQSInterface:
             "选择SQS生成方法:",
             choices=[
                 questionary.Choice(
-                    title="[1] 枚举法 (Enumeration) - 推荐",
+                    title="[1] 枚举法 (Enumeration)",
                     value="enumeration",
-                    description="全局最优解，结果尺寸灵活，适合中小体系"
+                    description="全局最优解，结果尺寸灵活"
                 ),
                 questionary.Choice(
-                    title="[2] MC方法 (Monte Carlo)",
+                    title="[2] MC方法 (Monte Carlo) - 保留空间群",
                     value="montecarlo",
-                    description="迭代优化，结果尺寸固定，适合精确控制结构大小"
+                    description="迭代优化，保留超胞空间群对称性，适合相变计算"
                 ),
                 questionary.Choice(
                     title="[q] 退出",

@@ -7,15 +7,36 @@
 
 ## 快速开始
 
+### 方式一：从 GitHub 克隆（推荐）
+
 ```bash
-# 1. 安装
+# 1. 克隆仓库
+git clone https://github.com/soft-defoliation/icet_SQS.git
+cd icet_SQS
+
+# 2. 安装
 pip install -e .
 
-# 2. 运行
+# 3. 运行
+sqskit
+```
+
+### 方式二：本地安装
+
+```bash
+# 1. 进入项目目录
+cd /path/to/SQS
+
+# 2. 安装
+pip install -e .
+
+# 3. 运行
 sqskit
 ```
 
 首次运行会自动生成 `dop.in` 模板，编辑掺杂浓度后重新运行即可。
+
+> **注意**：启动时 icet 库加载需要约 10-20 秒，属于正常现象。
 
 ## 特性
 
