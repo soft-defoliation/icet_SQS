@@ -321,8 +321,6 @@ class SQSQualityValidator:
 
         return results
 
-        return results
-
     def generate_report(self, output_file: Optional[Path] = None) -> dict[str, Any]:
         results = self.validate()
 

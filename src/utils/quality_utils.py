@@ -61,16 +61,7 @@ def calculate_target_cluster_vector(
             from icet.tools.structure_generation import _get_sqs_cluster_vector
             return _get_sqs_cluster_vector(cs, target_concentrations)
         except Exception:
-            # 如果失败，使用正确的简化方法
-            c_K = 0.25
-            c_Na = 0.75
-            delta_c = c_K - c_Na
-            # Index 1: c_K - c_Na
-            if n_components > 1:
-                cv_target[1] = delta_c
-            # Index 2+: (c_K - c_Na)^2 = 0.25 (对于二元无序合金)
-            for i in range(2, min(n_components, 10)):
-                cv_target[i] = delta_c ** 2  # 0.25
+            pass
     
     return cv_target
 

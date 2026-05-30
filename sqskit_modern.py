@@ -3,10 +3,15 @@
 
 import sys
 
+from src import __version__
 from src.cli.modern_interactive import ModernSQSInterface
 
 def main():
     """主函数"""
+    if '--version' in sys.argv or '-v' in sys.argv:
+        print(f"sqskit {__version__}")
+        sys.exit(0)
+
     try:
         interface = ModernSQSInterface()
         interface.run()

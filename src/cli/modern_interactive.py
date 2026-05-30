@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import Dict, Optional, Any
 
+from src import __version__
+from src.constants import Defaults
 from src.core import build_clusterspace as step1
 from src.core import generate_sqs_enum as step2a
 from src.core import generate_sqs_mc as step2b
@@ -29,32 +31,32 @@ console = Console()
 
 DEFAULTS = {
     'cluster_space': {
-        'cutoffs': [5.0],
-        'symprec': 1e-3,
-        'position_tolerance': 0.1,
+        'cutoffs': list(Defaults.CUTOFFS),
+        'symprec': Defaults.SYMPREC,
+        'position_tolerance': Defaults.POSITION_TOLERANCE,
     },
     'sqs': {
-        'max_size': 8,
-        'include_smaller_cells': False,
-        'supercell_matrix': [[2, 0, 0], [0, 2, 0], [0, 0, 2]],
-        'pbc': [True, True, True],
-        'tolerance': 0.001,
+        'max_size': Defaults.MAX_SIZE,
+        'include_smaller_cells': Defaults.INCLUDE_SMALLER_CELLS,
+        'supercell_matrix': [list(row) for row in Defaults.SUPERCELL_MATRIX],
+        'pbc': list(Defaults.PBC),
+        'tolerance': Defaults.TOLERANCE,
         'random_seed': None,
-        'max_iterations': 5,
-        'early_stop_no_improve': 3,
+        'max_iterations': Defaults.MAX_ITERATIONS,
+        'early_stop_no_improve': Defaults.EARLY_STOP_NO_IMPROVE,
         'save_progress': True,
-        'T_start': 5.0,
-        'T_stop': 0.001,
+        'T_start': Defaults.T_START,
+        'T_stop': Defaults.T_STOP,
     },
     'output': {
-        'directory': 'output',
-        'formats': ['vasp', 'cif'],
-        'filename_prefix': 'SQS',
+        'directory': Defaults.OUTPUT_DIR,
+        'formats': list(Defaults.FORMATS),
+        'filename_prefix': Defaults.FILENAME_PREFIX,
         'save_intermediate': True,
     },
     'validation': {
         'check_correlation': True,
-        'tolerance': 0.001,
+        'tolerance': Defaults.TOLERANCE,
     },
 }
 
@@ -490,6 +492,10 @@ class ModernSQSInterface:
 
 def main():
     """主函数"""
+    if '--version' in sys.argv or '-v' in sys.argv:
+        print(f"sqskit {__version__}")
+        sys.exit(0)
+
     try:
         interface = ModernSQSInterface()
         interface.run()
