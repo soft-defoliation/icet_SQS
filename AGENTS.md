@@ -77,6 +77,10 @@ Every pipeline module has two entry functions:
 
 When calling from other Python code, always use `run()`. Never call `main()` programmatically.
 
+**Exceptions to the pattern:**
+- `generate_sqs_enum.run()` returns `int` (0 = pass, 1 = fail) instead of raising exceptions.
+- `validate_export.main()` calls `run()` directly without error handling — it will crash on failure.
+
 ## dop.in Input Format
 
 Extended POSCAR with element annotations appended to coordinate lines:
@@ -115,6 +119,8 @@ On first run without `dop.in`, the CLI auto-generates a template from `POSCAR`.
 
 MC method **only supports diagonal supercell matrices** (non-diagonal elements must be 0). Validated in Pydantic model.
 
+**Note:** `build_clusterspace.py` reads `config.json` via raw `json.load()`, not through the Pydantic `SQSWorkflowConfig` model. If you change the config JSON schema, update both the model AND the manual parsing code.
+
 ## Key Dependencies
 
 ```
@@ -139,20 +145,20 @@ Defined as `QualityThresholds` class in `src/constants.py`.
 
 ## Code Conventions
 
-- Imports: `from __future__ import annotations` in most files (not all — don't assume universal)
-- Logging: `from src.logging_config import get_logger` → `logger = get_logger(__name__)`
-- Pydantic models: all in `src/models.py`, never scattered across modules
-- Constants: all magic numbers and thresholds in `src/constants.py`
-- File path constants: `src/constants.py` → `FileNames` class
-- icet log level set to WARNING in core modules: `set_log_config(level='WARNING')`
-- VASP output: atoms sorted by element symbol before writing
+- **`__future__ import annotations`**: Only in 5 files — `parser.py`, `models.py`, `quality_utils.py`, `generate_sqs_enum.py`, `validate_quality.py`. Other files do NOT use it. Don't assume it's available.
+- **Logging**: `get_logger` is only used in `parser.py`. Core modules use `print()` directly, not a logger.
+- **icet log silencing**: All 4 core SQS modules suppress icet logs via `set_log_config(level='WARNING')` at module level. `validate_export.py` is the exception — it doesn't touch icet.
+- **Pydantic models**: all in `src/models.py`, never scattered across modules
+- **Constants**: all magic numbers and thresholds in `src/constants.py`
+- **File path constants**: `src/constants.py` → `FileNames` class
+- **VASP output**: atoms sorted by element symbol before writing (seen in `validate_export.py` and `generate_sqs_mc.py`)
 
 ## Testing
 
 Tests use **pytest** with `conftest.py` fixtures:
 - `tmp_path` — pytest built-in for temporary file isolation
 - `monkeypatch` — for `chdir` in file-finding tests
-- `temp_workdir` in conftest.py — chdir-based fixture (available but some tests use `tmp_path` directly)
+- `temp_workdir` in conftest.py — chdir-based fixture
 
 Test files:
 - `test_generality.py` — parsing across crystal structures (FCC binary, spinel, pure element)
@@ -161,20 +167,20 @@ Test files:
 
 ## Known Quirks
 
-1. **Duplicate parser**: `src/core/build_clusterspace.py` has its own `parse_labeled_poscar()` function instead of using `src/parser.py`. Changes to dop.in parsing must update both.
+1. **Version mismatch**: `src/__init__.py` declares `__version__ = "2.1.0"` but `pyproject.toml` says `version = "0.2.0"`. Update both if bumping version.
 2. **File numbering gap**: Intermediate files are numbered `02_*`, `03_*` (no `01_*`). This is by design — Step 1 output starts at `02`.
-3. **Dead code**: `validate_quality.py` line 323-324 has `return results` duplicated — the second is unreachable.
-4. **Console script**: `pyproject.toml` defines `sqskit` CLI entry point, but `requirements.txt` is missing `rich` and `questionary` (only in `pyproject.toml`).
+3. **No requirements.txt**: The file does not exist. `pyproject.toml` is the sole dependency manifest. The README references it but that reference is stale.
+4. **Raw config parsing in build_clusterspace.py**: `config.json` is parsed with `json.load()` directly (line 72), bypassing the `SQSWorkflowConfig` Pydantic model. Schema changes must sync both.
 5. **Enumeration vs MC**: Enumeration guarantees global optimum but only for small/medium systems. MC works for large systems but may find local optima.
 6. **Entry file location**: `sqskit_modern.py` is in the repo root, NOT inside `src/`.
 7. **Gitignored runtime files**: `config.json`, `dop.in`, `output/*`, `SQS_FINAL.vasp`, `atom_index_guide.txt` — never committed.
+8. **icet startup delay**: The icet library takes ~10-20 seconds to load on first import. This is normal, not a hang.
 
 ## Source Structure
 
 ```
 sqskit_modern.py              # ← Main entry (repo root)
-pyproject.toml                # Package config
-requirements.txt              # Note: incomplete vs pyproject.toml
+pyproject.toml                # Package config & dependency manifest (sole source of truth)
 src/
 ├── cli/modern_interactive.py # Interactive CLI (rich + questionary)
 ├── core/                     # Pipeline steps
@@ -189,7 +195,7 @@ src/
 ├── parser.py                 # dop.in parser (StructureParser class)
 ├── models.py                 # Pydantic data models (all models here)
 ├── constants.py              # Global constants & thresholds
-└── logging_config.py         # Logging configuration
+└── logging_config.py         # Logging configuration (only used by parser.py)
 tests/
 ├── conftest.py               # Shared fixtures
 ├── test_generality.py        # Cross-structure parsing tests

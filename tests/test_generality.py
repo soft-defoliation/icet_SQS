@@ -1,7 +1,7 @@
 """通用性测试 — 测试对不同晶体结构和掺杂体系的支持"""
 
 import pytest
-import tempfile
+
 from pathlib import Path
 
 from src.parser import StructureParser
@@ -40,7 +40,7 @@ Direct
         parsed = StructureParser(fcc_dop_in).parse()
         for site in parsed.sites:
             assert site.is_disordered
-            assert site.concentration == {'Cu': 0.5, 'Au': 0.5}
+            assert site.concentration == {"Cu": 0.5, "Au": 0.5}
 
 
 class TestSpinelParsing:
@@ -79,7 +79,7 @@ Direct
     def test_spinel_disordered_site_has_mixed_occupancy(self, spinel_dop_in):
         parsed = StructureParser(spinel_dop_in).parse()
         disordered = [s for s in parsed.sites if s.is_disordered]
-        assert disordered[0].concentration == {'Mg': 0.5, 'Al': 0.5}
+        assert disordered[0].concentration == {"Mg": 0.5, "Al": 0.5}
 
 
 class TestTemplateGenerator:

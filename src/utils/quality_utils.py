@@ -13,7 +13,10 @@ from ase import Atoms
 ICET_SQS_VECTOR_AVAILABLE = False
 _get_sqs_cluster_vector_fn: Any = None
 try:
-    from icet.tools.structure_generation import _get_sqs_cluster_vector as _get_sqs_cluster_vector_fn
+    from icet.tools.structure_generation import (
+        _get_sqs_cluster_vector as _get_sqs_cluster_vector_fn,
+    )
+
     ICET_SQS_VECTOR_AVAILABLE = True
 except ImportError:
     pass
@@ -22,11 +25,11 @@ except ImportError:
 def calculate_target_cluster_vector(
     cs: ClusterSpace,
     target_concentrations: Optional[dict[str, dict[str, float]]] = None,
-    n_components: Optional[int] = None
+    n_components: Optional[int] = None,
 ) -> np.ndarray:
     """
     计算目标团簇向量（随机合金的统计期望值）。
-    
+
     对于随机合金，团簇向量的期望值基于浓度乘积：
     - 空团簇 (order 0): 1.0
     - 单点团簇 (order 1): 各点浓度的平均值
@@ -46,23 +49,31 @@ def calculate_target_cluster_vector(
 
     cv_target = np.zeros(n_components)
     cv_target[0] = 1.0
-    
+
     if not target_concentrations:
         return cv_target
-    
+
     all_concs = []
     for site_concs in target_concentrations.values():
         for elem, conc in site_concs.items():
             all_concs.append(conc)
-    
+
     if len(all_concs) >= 2:
         # 使用 icet 官方方法计算目标团簇向量
         try:
             from icet.tools.structure_generation import _get_sqs_cluster_vector
+
             return _get_sqs_cluster_vector(cs, target_concentrations)
-        except Exception:
+        except ImportError:
             pass
-    
+        except Exception:
+            import sys
+
+            print(
+                "  警告: icet 目标团簇向量计算失败，回退到近似值",
+                file=sys.stderr,
+            )
+
     return cv_target
 
 
@@ -70,24 +81,20 @@ def calculate_cv_deviation(
     cs: ClusterSpace,
     sqs: Atoms,
     target_concentrations: Optional[dict[str, dict[str, float]]] = None,
-    use_icet_comparison: bool = True
+    use_icet_comparison: bool = True,
 ) -> float:
     cv_sqs = cs.get_cluster_vector(sqs)
 
     cv_target = calculate_target_cluster_vector(
-        cs,
-        target_concentrations=target_concentrations,
-        n_components=len(cv_sqs)
+        cs, target_concentrations=target_concentrations, n_components=len(cv_sqs)
     )
 
     if use_icet_comparison:
         try:
             from icet.tools.structure_generation import compare_cluster_vectors
+
             deviation = compare_cluster_vectors(
-                cv_1=cv_sqs,
-                cv_2=cv_target,
-                as_list=cs.as_list,
-                optimality_weight=1.0
+                cv_1=cv_sqs, cv_2=cv_target, as_list=cs.as_list, optimality_weight=1.0
             )
         except ImportError:
             deviation = np.sqrt(np.sum((cv_sqs - cv_target) ** 2))
@@ -101,10 +108,11 @@ def evaluate_sqs_quality(
     deviation: float,
     n_atoms: Optional[int] = None,
     n_disordered: Optional[int] = None,
-    target_concentrations: Optional[dict[str, dict[str, float]]] = None
+    target_concentrations: Optional[dict[str, dict[str, float]]] = None,
 ):
     """评估 SQS 质量（使用 QualityThresholds 统一阈���）"""
     from src.constants import QualityThresholds
+
     deviation = abs(deviation)
     grade, passed, msg = QualityThresholds.evaluate(deviation)
     if n_atoms and n_atoms < 200 and deviation >= QualityThresholds.EXCELLENT:
@@ -141,17 +149,17 @@ def calculate_per_order_deviation(
     for idx in range(len(cv_sqs)):
         order = order_map[idx]
         if order not in by_order:
-            by_order[order] = {'components': [], 'indices': [], 'order_name': _order_name(order)}
+            by_order[order] = {"components": [], "indices": [], "order_name": _order_name(order)}
         diff = abs(cv_sqs[idx] - cv_target[idx])
-        by_order[order]['components'].append(diff)
-        by_order[order]['indices'].append(idx)
+        by_order[order]["components"].append(diff)
+        by_order[order]["indices"].append(idx)
 
     for order, info in by_order.items():
-        comps = info['components']
-        info['max_deviation'] = float(max(comps))
-        info['mean_deviation'] = float(sum(comps) / len(comps))
-        info['l2_deviation'] = float(np.sqrt(sum(d ** 2 for d in comps)))
-        info['n_components'] = len(comps)
+        comps = info["components"]
+        info["max_deviation"] = float(max(comps))
+        info["mean_deviation"] = float(sum(comps) / len(comps))
+        info["l2_deviation"] = float(np.sqrt(sum(d**2 for d in comps)))
+        info["n_components"] = len(comps)
 
     return by_order
 
@@ -164,49 +172,47 @@ def count_perfect_matches(
     """统计各阈值下的完美匹配团簇数量（van de Walle 2013 核心思想）"""
     if thresholds is None:
         from src.constants import QualityThresholds
+
         thresholds = {
-            'excellent': QualityThresholds.EXCELLENT,
-            'good': QualityThresholds.GOOD,
-            'acceptable': QualityThresholds.ACCEPTABLE,
+            "excellent": QualityThresholds.EXCELLENT,
+            "good": QualityThresholds.GOOD,
+            "acceptable": QualityThresholds.ACCEPTABLE,
         }
 
     results: dict[str, dict[str, int]] = {}
     diffs = np.abs(cv_sqs - cv_target)
     n_total = len(diffs)
 
-    for label in ['excellent', 'good', 'acceptable']:
+    for label in ["excellent", "good", "acceptable"]:
         threshold = thresholds[label]
         n_matched = int(np.sum(diffs < threshold))
         results[label] = {
-            'matched': n_matched,
-            'total': n_total,
-            'percent': round(n_matched / n_total * 100, 1) if n_total > 0 else 0.0,
+            "matched": n_matched,
+            "total": n_total,
+            "percent": round(n_matched / n_total * 100, 1) if n_total > 0 else 0.0,
         }
 
     return results
 
 
 def _order_name(order: int) -> str:
-    names = {0: '空团簇', 1: '点团簇(1体)', 2: '对团簇(2体)',
-             3: '三体团簇', 4: '四体团簇'}
-    return names.get(order, f'{order}体团簇')
+    names = {0: "空团簇", 1: "点团簇(1体)", 2: "对团簇(2体)", 3: "三体团簇", 4: "四体团簇"}
+    return names.get(order, f"{order}体团簇")
 
 
 def estimate_achievable_deviation(
-    n_disordered: int,
-    target_concentrations: Optional[dict[str, dict[str, float]]] = None
+    n_disordered: int, target_concentrations: Optional[dict[str, dict[str, float]]] = None
 ) -> dict[str, Any]:
     if not target_concentrations:
-        return {'estimated_min_deviation': 0.0, 'is_limited': False}
+        return {"estimated_min_deviation": 0.0, "is_limited": False}
 
     conc_dict = list(target_concentrations.values())[0]
     concentrations = list(conc_dict.values())
 
     if len(concentrations) != 2:
-        return {'estimated_min_deviation': 0.0, 'is_limited': False}
+        return {"estimated_min_deviation": 0.0, "is_limited": False}
 
     c_min = min(concentrations)
-    c_max = max(concentrations)
 
     n_minority = round(n_disordered * c_min)
     n_majority = n_disordered - n_minority
@@ -229,18 +235,12 @@ def estimate_achievable_deviation(
         estimated_min_deviation *= size_factor
 
     return {
-        'estimated_min_deviation': estimated_min_deviation,
-        'is_limited': is_limited,
-        'n_disordered': n_disordered,
-        'actual_concentrations': {
-            'minority': actual_c_min,
-            'majority': actual_c_max
-        },
-        'discrete_atoms': {
-            'minority': n_minority,
-            'majority': n_majority
-        },
-        'concentration_error': concentration_error
+        "estimated_min_deviation": estimated_min_deviation,
+        "is_limited": is_limited,
+        "n_disordered": n_disordered,
+        "actual_concentrations": {"minority": actual_c_min, "majority": actual_c_max},
+        "discrete_atoms": {"minority": n_minority, "majority": n_majority},
+        "concentration_error": concentration_error,
     }
 
 
@@ -248,32 +248,27 @@ def get_system_size_recommendation(
     n_atoms: int,
     n_disordered: int,
     target_concentrations: Optional[dict[str, dict[str, float]]] = None,
-    current_deviation: Optional[float] = None
+    current_deviation: Optional[float] = None,
 ):
     recommendations = []
 
     if target_concentrations:
         estimation = estimate_achievable_deviation(n_disordered, target_concentrations)
-        min_dev = estimation['estimated_min_deviation']
+        min_dev = estimation["estimated_min_deviation"]
 
-        if estimation['is_limited']:
-            recommendations.append(
-                f"⚠ 系统限制: {n_disordered}个无序位点，估算最小可达到偏差 ~{min_dev:.3f}")
+        if estimation["is_limited"]:
+            recommendations.append(f"⚠ 系统限制: {n_disordered}个无序位点，估算最小可达到偏差 ~{min_dev:.3f}")
 
             if current_deviation is not None and current_deviation <= min_dev * 1.2:
-                recommendations.append(
-                    f"✓ 当前偏差 {current_deviation:.3f} 已接近理论下限 {min_dev:.3f}")
+                recommendations.append(f"✓ 当前偏差 {current_deviation:.3f} 已接近理论下限 {min_dev:.3f}")
                 recommendations.append("  → 这是该系统大小的物理极限，无需进一步优化")
 
     if n_disordered < 20:
-        recommendations.append(
-            f"💡 建议: 无序位点数较少({n_disordered})，建议增大超胞到至少50个无序位点")
+        recommendations.append(f"💡 建议: 无序位点数较少({n_disordered})，建议增大超胞到至少50个无序位点")
     elif n_disordered < 50:
-        recommendations.append(
-            f"💡 建议: 中等系统({n_disordered}无序位点)，质量可能受有限尺寸效应影响")
+        recommendations.append(f"💡 建议: 中等系统({n_disordered}无序位点)，质量可能受有限尺寸效应影响")
     else:
-        recommendations.append(
-            f"✓ 系统尺寸充足({n_disordered}无序位点)，可获得高质量SQS")
+        recommendations.append(f"✓ 系统尺寸充足({n_disordered}无序位点)，可获得高质量SQS")
 
     if target_concentrations and current_deviation is not None:
         conc_dict = list(target_concentrations.values())[0]
@@ -282,8 +277,7 @@ def get_system_size_recommendation(
         if len(concentrations) == 2:
             c_min = min(concentrations)
             if c_min < 0.2 or c_min > 0.8:
-                recommendations.append(
-                    f"⚠ 不对称浓度 ({c_min:.2f}:{1 - c_min:.2f}) 可能限制SQS质量")
+                recommendations.append(f"⚠ 不对称浓度 ({c_min:.2f}:{1 - c_min:.2f}) 可能限制SQS质量")
 
     return "\n".join(recommendations) if recommendations else "系统配置良好"
 
@@ -293,7 +287,7 @@ def print_sqs_quality_report(
     n_atoms: Optional[int] = None,
     n_disordered: Optional[int] = None,
     target_concentrations: Optional[dict[str, dict[str, float]]] = None,
-    detailed: bool = True
+    detailed: bool = True,
 ) -> None:
     print("\n" + "=" * 70)
     print("SQS质量评估报告")
@@ -320,9 +314,11 @@ def print_sqs_quality_report(
         print(recommendation)
 
         estimation = estimate_achievable_deviation(n_disordered, target_concentrations)
-        if estimation['is_limited']:
+        if estimation["is_limited"]:
             print(f"\n理论最小偏差估算: {estimation['estimated_min_deviation']:.6f}")
-            print(f"离散原子数: 少数元素={estimation['discrete_atoms']['minority']}, "
-                  f"多数元素={estimation['discrete_atoms']['majority']}")
+            print(
+                f"离散原子数: 少数元素={estimation['discrete_atoms']['minority']}, "
+                f"多数元素={estimation['discrete_atoms']['majority']}"
+            )
 
     print("\n" + "=" * 70)

@@ -11,6 +11,7 @@ def temp_workdir():
     with tempfile.TemporaryDirectory() as tmpdir:
         original = Path.cwd()
         import os
+
         os.chdir(tmpdir)
         yield Path(tmpdir)
         os.chdir(original)
