@@ -4,8 +4,8 @@ import pytest
 
 from pathlib import Path
 
-from src.parser import StructureParser
-from src.utils.template_generator import UniversalTemplateGenerator
+from sqs_workflow.parser import StructureParser
+from sqs_workflow.utils.template_generator import UniversalTemplateGenerator
 
 
 class TestBinaryAlloyParsing:
@@ -86,7 +86,7 @@ class TestTemplateGenerator:
     """模板生成器测试"""
 
     def test_module_exists(self):
-        assert Path("src/utils/template_generator.py").exists()
+        assert Path("src/sqs_workflow/utils/template_generator.py").exists()
 
     def test_class_importable(self):
         assert UniversalTemplateGenerator is not None

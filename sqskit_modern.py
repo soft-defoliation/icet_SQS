@@ -3,8 +3,8 @@
 
 import sys
 
-from src import __version__
-from src.cli.modern_interactive import ModernSQSInterface
+from sqs_workflow import __version__
+from sqs_workflow.cli.modern_interactive import ModernSQSInterface
 
 def main():
     """主函数"""

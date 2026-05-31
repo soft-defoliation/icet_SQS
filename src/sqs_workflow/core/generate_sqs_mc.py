@@ -24,12 +24,12 @@ from ase import Atoms
 
 set_log_config(level="WARNING")
 
-from src.utils.quality_utils import (  # noqa: E402
+from sqs_workflow.utils.quality_utils import (  # noqa: E402
     calculate_cv_deviation,
     evaluate_sqs_quality,
 )
-from src.parser import StructureParser  # noqa: E402
-from src.constants import FileNames  # noqa: E402
+from sqs_workflow.parser import StructureParser  # noqa: E402
+from sqs_workflow.constants import FileNames  # noqa: E402
 
 
 def generate_sqs_iterative(

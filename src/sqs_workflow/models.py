@@ -10,7 +10,7 @@ from typing import Any, Optional
 from pathlib import Path
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from src.constants import Defaults, QualityThresholds, CrystalPhases, MethodConfig
+from sqs_workflow.constants import Defaults, QualityThresholds, CrystalPhases, MethodConfig
 
 
 # =============================================================================

@@ -13,8 +13,8 @@ from typing import Optional
 import numpy as np
 from ase import Atoms
 
-from src.constants import FileNames
-from src.logging_config import get_logger
+from sqs_workflow.constants import FileNames
+from sqs_workflow.logging_config import get_logger
 
 logger = get_logger(__name__)
 

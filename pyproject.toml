@@ -6,7 +6,24 @@ build-backend = "setuptools.build_meta"
 name = "sqs-workflow"
 version = "0.2.0"
 description = "SQS (Special Quasirandom Structure) 生成工具 — 基于 icet"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.8"
+authors = [
+    {name = "soft-defoliation"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
     "icet>=3.2.0",
     "ase>=3.22.0",
@@ -15,6 +32,11 @@ dependencies = [
     "questionary>=1.10.0",
     "pydantic>=1.10.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/soft-defoliation/icet_SQS"
+Repository = "https://github.com/soft-defoliation/icet_SQS"
+Changelog = "https://github.com/soft-defoliation/icet_SQS/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -29,11 +51,10 @@ viz = [
 ]
 
 [project.scripts]
-sqskit = "src.cli.modern_interactive:main"
+sqskit = "sqs_workflow.cli.modern_interactive:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["src", "src.*"]
+where = ["src"]
 
 [tool.black]
 line-length = 100

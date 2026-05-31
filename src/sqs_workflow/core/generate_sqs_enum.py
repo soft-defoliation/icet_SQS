@@ -33,8 +33,11 @@ from icet.input_output.logging_tools import set_log_config
 # 配置 icet 日志
 set_log_config(level="WARNING")
 
-from src.utils.quality_utils import calculate_cv_deviation, evaluate_sqs_quality  # noqa: E402
-from src.constants import Tolerances, FileNames  # noqa: E402
+from sqs_workflow.utils.quality_utils import (  # noqa: E402
+    calculate_cv_deviation,
+    evaluate_sqs_quality,
+)
+from sqs_workflow.constants import Tolerances, FileNames  # noqa: E402
 
 
 def validate_target_concentrations(

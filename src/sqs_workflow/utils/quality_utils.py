@@ -111,7 +111,7 @@ def evaluate_sqs_quality(
     target_concentrations: Optional[dict[str, dict[str, float]]] = None,
 ):
     """评估 SQS 质量（使用 QualityThresholds 统一阈���）"""
-    from src.constants import QualityThresholds
+    from sqs_workflow.constants import QualityThresholds
 
     deviation = abs(deviation)
     grade, passed, msg = QualityThresholds.evaluate(deviation)
@@ -171,7 +171,7 @@ def count_perfect_matches(
 ) -> dict[str, dict[str, int]]:
     """统计各阈值下的完美匹配团簇数量（van de Walle 2013 核心思想）"""
     if thresholds is None:
-        from src.constants import QualityThresholds
+        from sqs_workflow.constants import QualityThresholds
 
         thresholds = {
             "excellent": QualityThresholds.EXCELLENT,

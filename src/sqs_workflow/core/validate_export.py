@@ -6,7 +6,7 @@ from pathlib import Path
 from ase import Atoms
 from ase.io import write
 
-from src.constants import FileNames
+from sqs_workflow.constants import FileNames
 
 
 def run():

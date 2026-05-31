@@ -18,10 +18,10 @@ from icet.input_output.logging_tools import set_log_config
 
 set_log_config(level="WARNING")
 
-from src.constants import QualityThresholds  # noqa: E402
+from sqs_workflow.constants import QualityThresholds  # noqa: E402
 
 
-from src.utils.quality_utils import (  # noqa: E402
+from sqs_workflow.utils.quality_utils import (  # noqa: E402
     calculate_cv_deviation,
     evaluate_sqs_quality,
     estimate_achievable_deviation,
@@ -137,7 +137,7 @@ class SQSQualityValidator:
             )
             cv_sqs = cs.get_cluster_vector(sqs_cv)
 
-            from src.utils.quality_utils import calculate_target_cluster_vector
+            from sqs_workflow.utils.quality_utils import calculate_target_cluster_vector
 
             cv_target_vals = calculate_target_cluster_vector(cs, target_conc, len(cv_sqs))
             match_stats = count_perfect_matches(cv_sqs, cv_target_vals)

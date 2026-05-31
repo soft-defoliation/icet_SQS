@@ -1,8 +1,8 @@
 """测试 CLI 验证方法和常量定义"""
 
 import pytest
-from src.cli.modern_interactive import ModernSQSInterface
-from src.constants import UIConfig
+from sqs_workflow.cli.modern_interactive import ModernSQSInterface
+from sqs_workflow.constants import UIConfig
 
 
 class TestInputValidation:

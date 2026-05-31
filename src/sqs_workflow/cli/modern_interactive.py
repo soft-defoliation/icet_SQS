@@ -6,13 +6,13 @@ import json
 from pathlib import Path
 from typing import Dict, Optional
 
-from src import __version__
-from src.constants import Defaults
-from src.core import build_clusterspace as step1
-from src.core import generate_sqs_enum as step2a
-from src.core import generate_sqs_mc as step2b
-from src.core import validate_export as step3
-from src.core import validate_quality as step4
+from sqs_workflow import __version__
+from sqs_workflow.constants import Defaults
+from sqs_workflow.core import build_clusterspace as step1
+from sqs_workflow.core import generate_sqs_enum as step2a
+from sqs_workflow.core import generate_sqs_mc as step2b
+from sqs_workflow.core import validate_export as step3
+from sqs_workflow.core import validate_quality as step4
 
 try:
     import questionary
@@ -101,7 +101,7 @@ class ModernSQSInterface:
         return Path(poscar_file) if poscar_file else None
 
     def _generate_template(self, poscar_file: Path):
-        from src.utils.template_generator import UniversalTemplateGenerator
+        from sqs_workflow.utils.template_generator import UniversalTemplateGenerator
 
         with console.status("[cyan]生成模板...[/cyan]"):
             try:

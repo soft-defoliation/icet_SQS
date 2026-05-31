@@ -4,9 +4,9 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from src.parser import StructureParser, ParsedStructure
-from src.models import SQSWorkflowConfig, SQSConfig, ClusterSpaceConfig
-from src.constants import QualityThresholds, FileNames, Defaults, MethodConfig
+from sqs_workflow.parser import StructureParser, ParsedStructure
+from sqs_workflow.models import SQSWorkflowConfig, SQSConfig, ClusterSpaceConfig
+from sqs_workflow.constants import QualityThresholds, FileNames, Defaults, MethodConfig
 
 
 class TestStructureParser:
@@ -137,7 +137,7 @@ class TestQualityAnalysis:
     """新质量分析函数测试"""
 
     def test_perfect_matches(self):
-        from src.utils.quality_utils import count_perfect_matches
+        from sqs_workflow.utils.quality_utils import count_perfect_matches
         import numpy as np
 
         cv_sqs = np.array([1.0, 0.001, 0.0005])
@@ -147,7 +147,7 @@ class TestQualityAnalysis:
         assert result["good"]["matched"] == 3
 
     def test_count_perfect_matches_all_zero(self):
-        from src.utils.quality_utils import count_perfect_matches
+        from sqs_workflow.utils.quality_utils import count_perfect_matches
         import numpy as np
 
         cv = np.zeros(5)
@@ -156,7 +156,7 @@ class TestQualityAnalysis:
         assert result["excellent"]["percent"] == 100.0
 
     def test_deviation_bar(self):
-        from src.core.validate_quality import _deviation_bar
+        from sqs_workflow.core.validate_quality import _deviation_bar
 
         bar_zero = _deviation_bar(0.0)
         assert "✓" in bar_zero

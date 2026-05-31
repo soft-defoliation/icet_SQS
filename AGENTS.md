@@ -10,17 +10,17 @@ SQS Workflow — A specialized SQS (Special Quasirandom Structure) generation to
 
 ```bash
 # 运行（安装后直接使用）
-sqskit  # → src.cli.modern_interactive:main
+sqskit  # → sqs_workflow.cli.modern_interactive:main
 
 # 也可以直接运行入口文件
 python sqskit_modern.py
 
 # Individual pipeline steps (importable)
-# src.core.build_clusterspace.run()   # Step 1
-# src.core.generate_sqs_enum.run()    # Step 2a
-# src.core.generate_sqs_mc.run()      # Step 2b
-# src.core.validate_export.run()      # Step 3
-# src.core.validate_quality.run()     # Step 4
+# sqs_workflow.core.build_clusterspace.run()   # Step 1
+# sqs_workflow.core.generate_sqs_enum.run()    # Step 2a
+# sqs_workflow.core.generate_sqs_mc.run()      # Step 2b
+# sqs_workflow.core.validate_export.run()      # Step 3
+# sqs_workflow.core.validate_quality.run()     # Step 4
 ```
 
 ## Development Setup
@@ -30,7 +30,7 @@ pip install -e .                # Required before any imports work
 pip install -e ".[dev]"         # Includes pytest, black, flake8
 ```
 
-**All commands must run from project root.** The package uses `src` as a top-level package (not `src/sqs_workflow`), so `import src.parser` works after editable install.
+**All commands must run from project root.** The package uses `sqs_workflow` as the top-level package (code lives under `src/sqs_workflow/`), so `import sqs_workflow.parser` works after editable install.
 
 ## Verification Commands
 
@@ -181,7 +181,7 @@ Test files:
 ```
 sqskit_modern.py              # ← Main entry (repo root)
 pyproject.toml                # Package config & dependency manifest (sole source of truth)
-src/
+src/sqs_workflow/
 ├── cli/modern_interactive.py # Interactive CLI (rich + questionary)
 ├── core/                     # Pipeline steps
 │   ├── build_clusterspace.py # Step 1: Build ClusterSpace

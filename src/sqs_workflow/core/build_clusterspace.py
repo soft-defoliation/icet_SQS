@@ -13,8 +13,8 @@ from icet.input_output.logging_tools import set_log_config
 
 set_log_config(level="WARNING")
 
-from src.constants import FileNames  # noqa: E402
-from src.parser import StructureParser  # noqa: E402
+from sqs_workflow.constants import FileNames  # noqa: E402
+from sqs_workflow.parser import StructureParser  # noqa: E402
 
 
 def validate_concentrations(target_concentrations):

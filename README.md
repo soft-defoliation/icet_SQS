@@ -50,8 +50,8 @@ sqskit
 
 ```
 sqskit_modern.py              # 主入口
-requirements.txt              # 依赖
-src/
+pyproject.toml                # 项目配置与依赖
+src/sqs_workflow/
 ├── cli/modern_interactive.py # 交互式界面
 ├── core/                     # 核心流水线
 │   ├── build_clusterspace.py
